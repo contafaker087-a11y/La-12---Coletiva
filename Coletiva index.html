@@ -1,105 +1,217 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Coletivo Tracker</title>
     <style>
-        body {
-            font-family: "Google Sans", "Arial", sans-serif;
-            line-height: 1.25;
-            color: #000000;
-            padding: 20px;
+        :root {
+            --bg-color: #0b0e14;
+            --card-bg: #151d2a;
+            --accent-blue: #00e5ff;
+            --accent-green: #39ff14;
+            --accent-purple: #bd00ff;
+            --text-main: #ffffff;
+            --text-muted: #8a99ad;
+            --border-color: #24344d;
         }
-        h1 {
-            color: #1a73e8;
-            border-bottom: 2px solid #1a73e8;
-            padding-bottom: 8px;
-        }
-        h2 {
-            color: #202124;
-            margin-top: 24px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 12px;
-            margin-bottom: 16px;
-        }
-        th, td {
-            border: 1px solid #dadce0;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f8f9fa;
-            font-weight: bold;
-        }
-        .highlight {
-            font-weight: bold;
-            color: #1a73e8;
-        }
-        .math-note {
-            font-size: 0.9em;
-            color: #5f6368;
-            font-style: italic;
-        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 900px; }
+        
+        header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid var(--border-color); padding-bottom: 15px; }
+        header h1 { font-size: 2.2rem; text-transform: uppercase; letter-spacing: 2px; }
+        header p { color: var(--text-muted); margin-top: 5px; }
+
+        .navigation-panel { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .info-badge { background: rgba(0, 229, 255, 0.1); border: 1px solid var(--accent-blue); padding: 6px 12px; border-radius: 20px; font-size: 0.95rem; font-weight: bold; }
+        .select-box { background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 15px; border-radius: 6px; font-size: 0.95rem; cursor: pointer; outline: none; }
+        
+        .global-stats { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .global-stats h2 { font-size: 1.1rem; color: var(--text-muted); text-transform: uppercase; }
+        .global-stats .rating { font-size: 3.5rem; font-weight: 800; color: var(--accent-blue); margin: 5px 0; text-shadow: 0 0 15px rgba(0, 229, 255, 0.4); }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
+        @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
+
+        .card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 15px; }
+        .player-name { font-size: 1.3rem; font-weight: 700; }
+        .player-perf { background: rgba(255,255,255,0.07); padding: 4px 10px; border-radius: 20px; font-weight: bold; }
+
+        .stats-list { list-style: none; }
+        .stat-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .stat-label { color: var(--text-muted); }
+        .stat-val { font-weight: 600; }
+
+        .potential-box { margin-top: 15px; background: rgba(0, 0, 0, 0.2); padding: 12px; border-radius: 8px; border-left: 4px solid var(--accent-blue); }
+        .potential-title { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; }
+        .potential-bar-container { width: 100%; height: 8px; background-color: #1e293b; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+        .potential-bar { height: 100%; background: var(--accent-blue); border-radius: 4px; }
+        .potential-desc { font-size: 0.85rem; color: var(--text-muted); margin-top: 5px; display: block; }
+        
+        .extra-badge { background: rgba(0, 229, 255, 0.1); color: var(--accent-blue); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-left: 5px; }
     </style>
 </head>
 <body>
 
-    <h1>COLETIVO DE HOJE</h1>
-    <h2>Destaques do Treino</h2>
+    <div class="container">
+        <header>
+            <h1>⚽ TRACKER DE COLETIVOS ⚽</h1>
+            <p>Estatísticas, Rendimento e Evolução do Elenco</p>
+        </header>
 
-    <table>
-        <tr>
-            <th>Jogador</th>
-            <th>Passes</th>
-            <th>Finalização</th>
-            <th>Drible</th>
-            <th>Extra / Observação</th>
-            <th>Performance Atual</th>
-            <th>Potencial Alcançado</th>
-        </tr>
-        <tr>
-            <td><strong>Xavier ⬆️</strong></td>
-            <td>6,8</td>
-            <td>6,6</td>
-            <td>5,0</td>
-            <td>-</td>
-            <td class="highlight">6,1</td>
-            <td>61% <br><span class="math-note">(39% de margem)</span></td>
-        </tr>
-        <tr>
-            <td><strong>Hafa ⬆️</strong></td>
-            <td>7,0</td>
-            <td>6,4</td>
-            <td>7,0</td>
-            <td>-</td>
-            <td class="highlight">6,8</td>
-            <td>68% <br><span class="math-note">(32% de margem)</span></td>
-        </tr>
-        <tr>
-            <td><strong>Diogo Fox ⬆️</strong></td>
-            <td>9,0</td>
-            <td>8,4</td>
-            <td>7,8</td>
-            <td>-</td>
-            <td class="highlight">8,4</td>
-            <td>84% <br><span class="math-note">(Faltam 16%)</span></td>
-        </tr>
-        <tr>
-            <td><strong>Naraka ⬆️</strong></td>
-            <td>6,4</td>
-            <td>6,0</td>
-            <td>5,3</td>
-            <td>Defesa: 8,0 <br><span class="math-note">(GK Provisório)</span></td>
-            <td class="highlight">5,9</td>
-            <td>59% <br><span class="math-note">(41% de margem)</span></td>
-        </tr>
-    </table>
+        <!-- Painel de Seleção de Treinos -->
+        <div class="navigation-panel">
+            <div id="treino-info-badge" class="info-badge">Carregando...</div>
+            <div>
+                <label for="treino-selector" style="color: var(--text-muted); margin-right: 10px; font-size: 0.95rem;">Ver Treino de:</label>
+                <select id="treino-selector" class="select-box" onchange="selecionarTreino(this.value)">
+                    <!-- Preenchido via JavaScript -->
+                </select>
+            </div>
+        </div>
 
-    <br>
-    <h2>Resumo Geral do Grupo</h2>
-    <p><strong>Potencial Médio do Coletivo:</strong> <span class="highlight">6,8 / 10</span></p>
-    <p class="math-note">Cálculo geral do dia: (6,1 + 6,8 + 8,4 + 5,9) ÷ 4 = 6,8</p>
+        <!-- Média Geral do Treino Selecionado -->
+        <div class="global-stats">
+            <h2>Potencial Médio do Coletivo</h2>
+            <div id="media-coletivo-val" class="rating">0.0</div>
+            <p id="label-status-treino" style="color: var(--text-muted); font-size: 0.9rem;">Média da Performance Atual</p>
+        </div>
 
+        <!-- Grid de Jogadores -->
+        <div id="jogadores-grid" class="grid">
+            <!-- Preenchido via JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // HISTÓRICO DE TREINOS - ATUALIZE AQUI ABAIXO!
+        // ==========================================
+        // O primeiro treino da lista SEMPRE será exibido como o Mais Recente/Atual de forma automática.
+        const historicoTreinos = [
+            {
+                data: "30/05/2026",
+                horario: "16:00",
+                jogadores: [
+                    { nome: "Xavier ⬆️", passes: 6.8, finalizacao: 6.6, drible: 5.0, icon: "🟩", color: "#39ff14" },
+                    { nome: "Hafa ⬆️", passes: 7.0, finalizacao: 6.4, drible: 7.0, icon: "🟦", color: "#00e5ff" },
+                    { nome: "Diogo Fox ⬆️", passes: 9.0, finalizacao: 8.4, drible: 7.8, icon: "🟪", color: "#bd00ff" },
+                    { nome: "Naraka ⬆️", passes: 6.4, finalizacao: 6.0, drible: 5.3, icon: "🟩", color: "#00e5ff", extraLabel: "GK Provisório", extraValue: 8.0, extraIcon: "🟦 Defesa" }
+                ]
+            },
+            {
+                data: "28/05/2026",
+                horario: "14:30",
+                jogadores: [
+                    { nome: "Xavier ⬆️", passes: 6.0, finalizacao: 5.8, drible: 4.8, icon: "🟩", color: "#39ff14" },
+                    { nome: "Hafa ⬆️", passes: 6.5, finalizacao: 6.0, drible: 6.8, icon: "🟦", color: "#00e5ff" },
+                    { nome: "Diogo Fox ⬆️", passes: 8.5, finalizacao: 8.0, drible: 7.5, icon: "🟪", color: "#bd00ff" }
+                ]
+            }
+        ];
+
+        // ==========================================
+        // LÓGICA DO SISTEMA (NÃO PRECISA MEXER)
+        // ==========================================
+        
+        function inicializarSite() {
+            const selector = document.getElementById('treino-selector');
+            selector.innerHTML = '';
+
+            historicoTreinos.forEach((treino, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `${treino.data} às ${treino.horario} ${index === 0 ? '(Mais Atual)' : ''}`;
+                selector.appendChild(option);
+            });
+
+            // Carrega o primeiro treino (Mais Atual) por padrão
+            renderizarTreino(0);
+        }
+
+        function renderizarTreino(index) {
+            const treino = historicoTreinos[index];
+            const grid = document.getElementById('jogadores-grid');
+            const infoBadge = document.getElementById('treino-info-badge');
+            const mediaVal = document.getElementById('media-coletivo-val');
+            const labelStatus = document.getElementById('label-status-treino');
+
+            // Atualiza o Badge de Status superior
+            if(parseInt(index) === 0) {
+                infoBadge.innerHTML = `🟢 TREINO MAIS RECENTE: ${treino.data} - ${treino.horario}`;
+                labelStatus.textContent = "Média da Performance Atual (Último Treino)";
+            } else {
+                infoBadge.innerHTML = `📜 HISTÓRICO: Treino de ${treino.data} - ${treino.horario}`;
+                labelStatus.textContent = `Média da Performance neste treino passado`;
+            }
+
+            grid.innerHTML = '';
+            let somaDasPerformances = 0;
+
+            treino.jogadores.forEach(j => {
+                // Calcula a média das 3 notas básicas de linha
+                const perfAtual = ((j.passes + j.finalizacao + j.drible) / 3).toFixed(1);
+                somaDasPerformances += parseFloat(perfAtual);
+                const potencialPct = Math.round((perfAtual / 10) * 100);
+                const margemEvolucao = (100 - potencialPct);
+
+                let extraHtml = '';
+                if(j.extraLabel) {
+                    extraHtml = `
+                        <li class="stat-item" style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-color);">
+                            <span class="stat-label">${j.extraIcon} <span class="extra-badge">${j.extraLabel}</span></span>
+                            <span class="stat-val" style="color: ${j.color}">${j.extraValue.toFixed(1)}</span>
+                        </li>
+                    `;
+                }
+
+                const cardHtml = `
+                    <div class="card" style="border-top: 4px solid ${j.color}">
+                        <div class="card-header">
+                            <span class="player-name">${j.nome}</span>
+                            <span class="player-perf" style="color: ${j.color}">${perfAtual}</span>
+                        </div>
+                        <ul class="stats-list">
+                            <li class="stat-item">
+                                <span class="stat-label">${j.icon} Passes</span>
+                                <span class="stat-val">${j.passes.toFixed(1)}</span>
+                            </li>
+                            <li class="stat-item">
+                                <span class="stat-label">🟩 Finalização</span>
+                                <span class="stat-val">${j.finalizacao.toFixed(1)}</span>
+                            </li>
+                            <li class="stat-item">
+                                <span class="stat-label">${j.icon} Drible</span>
+                                <span class="stat-val">${j.drible.toFixed(1)}</span>
+                            </li>
+                            ${extraHtml}
+                        </ul>
+                        <div class="potential-box" style="border-left-color: ${j.color}">
+                            <div class="potential-title">Potencial Alcançado: ${potencialPct}%</div>
+                            <div class="potential-bar-container">
+                                <div class="potential-bar" style="width: ${potencialPct}%; background: ${j.color};"></div>
+                            </div>
+                            <span class="potential-desc">${margemEvolucao === 16 ? 'Falta apenas 16% para atingir o nível máximo!' : 'Tem ' + margemEvolucao + '% de margem para evoluir até o topo.'}</span>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += cardHtml;
+            });
+
+            // Calcula e exibe a média do coletivo
+            const mediaGeralDoTreino = (somaDasPerformances / treino.jogadores.length).toFixed(1);
+            mediaVal.textContent = mediaGeralDoTreino;
+        }
+
+        function selecionarTreino(index) {
+            renderizarTreino(index);
+        }
+
+        // Executa ao carregar a página
+        window.onload = inicializarSite;
+    </script>
 </body>
 </html>
